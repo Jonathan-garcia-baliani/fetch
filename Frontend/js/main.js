@@ -1,63 +1,55 @@
 import { fetchData } from './fetchData.js';
 
-// URL base de la API
-const baseUrl = 'http://localhost:3000';
+const touristPlacesContainer = document.getElementById('touristPlacesContainer');
+const countriesUrl = 'https://restcountries.com/v3.1/all';
 
-// URL para registrar usuario
-const registerUrl = `${baseUrl}/api/register`;
+const cryptoContainer = document.getElementById('cryptoContainer');
+const cryptoApiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd';
 
-// URL para iniciar sesión
-const loginUrl = `${baseUrl}/api/login`;
-
-// Función para registrar un usuario
-async function registrarUsuario(userData) {
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData)
-    };
-    const response = await fetchData(registerUrl, options);
+// Función para obtener y mostrar un lugar turístico aleatorio
+async function mostrarLugarTuristicoAleatorio() {
+    const response = await fetchData(countriesUrl);
     if (response) {
-        console.log('Usuario registrado:', response);
-        window.location.href = response.redirectUrl;
+        const randomIndex = Math.floor(Math.random() * response.length);
+        const country = response[randomIndex];
+        const countryElement = document.createElement('div');
+        countryElement.className = 'country';
+        countryElement.innerHTML = `
+            <h3>${country.name.common}</h3>
+            <p>Capital: ${country.capital ? country.capital[0] : 'N/A'}</p>
+            <p>Región: ${country.region}</p>
+            <img src="${country.flags.png}" alt="Bandera de ${country.name.common}" width="100">
+        `;
+        touristPlacesContainer.appendChild(countryElement);
+    } else {
+        touristPlacesContainer.textContent = 'Error al obtener la información. Inténtelo nuevamente.';
     }
 }
 
-// Función para iniciar sesión
-async function iniciarSesion(credentials) {
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
-    };
-    const response = await fetchData(loginUrl, options);
-    if (response) {
-        console.log('Sesión iniciada:', response);
-        window.location.href = response.redirectUrl;
+// Función para mostrar precios de criptomonedas
+async function mostrarPrecios() {
+    console.log('Fetching data from CoinGecko API...');
+    const data = await fetchData(cryptoApiUrl);
+    console.log('Data received:', data);
+    if (data) {
+        const bitcoinPrice = data.bitcoin.usd;
+        const ethereumPrice = data.ethereum.usd;
+
+        const cryptoElement = document.createElement('div');
+        cryptoElement.className = 'crypto';
+        cryptoElement.innerHTML = `
+            <p>Bitcoin: $${bitcoinPrice} USD</p>
+            <p>Ethereum: $${ethereumPrice} USD</p>
+        `;
+
+        cryptoContainer.appendChild(cryptoElement);
+    } else {
+        cryptoContainer.textContent = 'Error al obtener la información. Inténtelo nuevamente.';
     }
 }
 
-// Ejemplo de uso
-document.getElementById('registerForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const userData = {
-        username: event.target.username.value,
-        password: event.target.password.value,
-        email: event.target.email.value,
-        age: event.target.age.value
-    };
-    await registrarUsuario(userData);
-});
-
-document.getElementById('loginForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const credentials = {
-        username: event.target.username.value,
-        password: event.target.password.value
-    };
-    await iniciarSesion(credentials);
+// Llamar a las funciones al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    mostrarLugarTuristicoAleatorio();
+    mostrarPrecios();
 });
