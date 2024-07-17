@@ -722,4 +722,26 @@ h1 {
   color: #333;
 }
 
+.weather {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.weather .city {
+  margin: 10px 0;
+}
+
+.card {
+  margin: 10px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-body {
+  text-align: left;
+}
+
 /*# sourceMappingURL=estilo.css.map */
